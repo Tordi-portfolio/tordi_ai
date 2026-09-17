@@ -1,0 +1,32 @@
+# Environment variables (Prevents pushing API keys and Secrets)
+.env
+.env.*
+!.env.example
+
+# Python / Virtual Environment
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+ENV/
+.venv/
+
+# Django files
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Git / System
+*.bak
+*.swp

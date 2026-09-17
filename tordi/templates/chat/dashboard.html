@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Tordi — Chat{% endblock %}
+{% block body %}
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="auth-brand small">
+        <span class="brand-mark">T</span>
+        <h1>Tordi</h1>
+      </div>
+      <button class="icon-btn" id="collapseSidebarBtn" title="Collapse sidebar">☰</button>
+    </div>
+
+    <form method="post" action="{% url 'chat:new_chat' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn-new-chat">+ New chat</button>
+    </form>
+
+    <div class="sidebar-list" id="sidebarList">
+      {% for c in conversations %}
+        <div class="chat-item {% if active_conversation and c.id == active_conversation.id %}active{% endif %}" data-id="{{ c.id }}">
+          <a href="/?chat={{ c.id }}" class="chat-item-link">
+            {% if c.pinned %}<span class="pin-dot" title="Pinned">📌</span>{% endif %}
+            <span class="chat-item-title" data-id="{{ c.id }}">{{ c.title }}</span>
+          </a>
+          <div class="chat-item-actions">
+            <button class="icon-btn tiny pin-btn" data-id="{{ c.id }}" title="Pin/unpin">📌</button>
+            <button class="icon-btn tiny rename-btn" data-id="{{ c.id }}" title="Rename">✏️</button>
+            <button class="icon-btn tiny delete-btn" data-id="{{ c.id }}" title="Delete">🗑️</button>
+          </div>
+        </div>
+      {% empty %}
+        <p class="empty-hint">No chats yet. Start a new one!</p>
+      {% endfor %}
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="theme-toggle" role="group" aria-label="Theme switch">
+        <button class="theme-btn" data-theme="light" title="Light">☀️</button>
+        <button class="theme-btn" data-theme="dark" title="Dark">🌙</button>
+        <button class="theme-btn" data-theme="brown" title="Brown">🟤</button>
+      </div>
+      <div class="user-row">
+        <div class="user-avatar">{{ request.user.username|first|upper }}</div>
+        <span class="user-name">{{ request.user.username }}</span>
+        <a href="{% url 'accounts:logout' %}" class="icon-btn" title="Log out">⏻</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT -->
+  <main class="chat-main">
+    <header class="chat-topbar">
+      <button class="icon-btn mobile-only" id="openSidebarBtn">☰</button>
+      <h2 id="chatTitle">{{ active_conversation.title|default:"Tordi" }}</h2>
+      <span class="tagline">Petroleum &amp; Engineering AI</span>
+    </header>
+
+    <div class="chat-window" id="chatWindow" data-conversation-id="{{ active_conversation.id|default:'' }}">
+      {% if not active_conversation %}
+        <div class="welcome">
+          <div class="welcome-mark">T</div>
+          <h2>Hi, I'm Tordi.</h2>
+          <p>Ask me anything about petroleum engineering — reservoirs, drilling, completions, production, PVT, well testing — or any other engineering field. Start a new chat to begin.</p>
+        </div>
+      {% else %}
+        {% for m in chat_messages %}
+          {% include "chat/_message.html" with message=m %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <form class="chat-input-bar" id="chatForm" autocomplete="off">
+      <div class="attachment-preview" id="attachmentPreview"></div>
+      <div class="input-row">
+        <label class="icon-btn attach-btn" title="Attach image">
+          📎
+          <input type="file" id="imageInput" accept="image/*" hidden>
+        </label>
+        <textarea id="messageInput" placeholder="Message Tordi about petroleum or engineering..." rows="1"></textarea>
+        <button type="button" class="icon-btn mic-btn" id="micBtn" title="Record voice note">🎙️</button>
+        <button type="submit" class="send-btn" id="sendBtn" title="Send">➤</button>
+      </div>
+      <div class="input-hint" id="inputHint">Tordi can help with petroleum engineering and other engineering fields.</div>
+    </form>
+  </main>
+</div>
+
+<template id="messageTemplate">
+  {% include "chat/_message.html" %}
+</template>
+
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.TORDI = {
+    csrfToken: document.querySelector('[name=csrfmiddlewaretoken]').value,
+    sendUrlTemplate: "{% url 'chat:send_message' 999999 %}",
+    editUrlTemplate: "{% url 'chat:edit_message' 999999 %}",
+    renameUrlTemplate: "{% url 'chat:rename_chat' 999999 %}",
+    deleteUrlTemplate: "{% url 'chat:delete_chat' 999999 %}",
+    pinUrlTemplate: "{% url 'chat:pin_chat' 999999 %}",
+    setThemeUrl: "{% url 'accounts:set_theme' %}",
+  };
+</script>
+<script src="{% static 'js/app.js' %}"></script>
+{% endblock %}

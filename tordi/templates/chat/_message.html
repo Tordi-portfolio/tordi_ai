@@ -1,0 +1,23 @@
+{% if message %}
+<div class="message {{ message.role }}" data-id="{{ message.id }}">
+  <div class="message-avatar">
+    {% if message.role == 'user' %}{{ request.user.username|first|upper }}{% else %}T{% endif %}
+  </div>
+  <div class="message-body">
+    {% if message.image %}
+      <img src="{{ message.image.url }}" class="message-image" alt="attached image">
+    {% endif %}
+    {% if message.audio %}
+      <audio controls src="{{ message.audio.url }}" class="message-audio"></audio>
+    {% endif %}
+    <div class="message-text" data-raw="{{ message.content }}">{{ message.content|linebreaksbr }}</div>
+    {% if message.edited %}<span class="edited-tag">(edited)</span>{% endif %}
+    <div class="message-actions">
+      <button class="msg-action copy-btn" title="Copy">📋 Copy</button>
+      {% if message.role == 'user' %}
+        <button class="msg-action edit-btn" title="Edit &amp; resend">✏️ Edit</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}

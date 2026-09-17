@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Tordi — Petroleum & Engineering AI{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+{% block body %}{% endblock %}
+<script>
+  // Apply saved theme before paint as much as possible
+  (function () {
+    var saved = localStorage.getItem('tordi-theme') || "{{ request.user.theme_preference|default:'dark' }}";
+    document.documentElement.setAttribute('data-theme', saved);
+  })();
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
